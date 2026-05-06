@@ -53,22 +53,22 @@ def main():
   snake = Snake(window)
   food = Food(window)
   while True:
-    
     for event in pygame.event.get():
       if event.type == pygame.QUIT:
         pygame.quit()
         sys.exit()
       elif event.type == pygame.KEYDOWN:
-        keys = pygame.key.get_pressed()
-    
-        if keys[pygame.K_w]:
+        # Para di maka balik ang halas like from up to down
+        # i check na if ang bag ong direction kay opposite ba sa original direction
+        if event.key == pygame.K_w and snake.direction.y != 1:
           snake.direction = pygame.Vector2(0, -1)
-        if keys[pygame.K_s]:
+        if event.key == pygame.K_s and snake.direction.y != -1:
           snake.direction = pygame.Vector2(0, 1)
-        elif keys[pygame.K_d]:
+        if event.key == pygame.K_d and snake.direction.x != -1:
           snake.direction = pygame.Vector2(1, 0)
-        elif keys[pygame.K_a]:
+        if event.key == pygame.K_a and snake.direction.x != 1:
           snake.direction = pygame.Vector2(-1, 0)
+          
 
     window.fill('black')
 
@@ -83,6 +83,13 @@ def main():
       
       # then set nato ang is_growing to True 
       snake.is_growing = True
+
+     # Bawal Kaonon ang ikog rule
+    for segment in snake.body[1:]:
+      if snake.body[0] == segment:
+        print("Game Over! You bit yourself. ")
+        pygame.quit()
+        sys.exit()
       
     """ 
       Check nato if mulapas ang snake sa screen.
