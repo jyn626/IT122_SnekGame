@@ -83,9 +83,24 @@ def main():
       
       # then set nato ang is_growing to True 
       snake.is_growing = True
-    
+      
+    """ 
+      Check nato if mulapas ang snake sa screen.
+      If mulapas then ilusot ra nato ang sa other side haha
+      ex. mulapas sa left side then mulusot sa right side
+    """
+    if snake.body[0].x < -1:
+      snake.body[0].x = number_of_cells
+    elif snake.body[0].x > number_of_cells: 
+      snake.body[0].x = 0
+      
+    if snake.body[0].y < -1:
+      snake.body[0].y = number_of_cells
+    elif snake.body[0].y > number_of_cells: 
+      snake.body[0].y = 0
+  
     pygame.display.flip()
-    clock.tick(15)
+    clock.tick(8)
 
 
 if __name__ == '__main__':
