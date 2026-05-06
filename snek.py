@@ -6,6 +6,23 @@ cell_size = 25
 number_of_cells = 25
 
 
+class Food: 
+
+  def __init__(self, window): 
+    self.window = window
+    self.position = self.generate_random_position()
+
+  def draw(self):
+    rect = pygame.Rect((self.position.x * cell_size, self.position.y * cell_size), (cell_size, cell_size))
+    pygame.draw.rect(self.window, (255, 0, 0), rect)
+    
+  def generate_random_position(self):
+    random_x = random.randint(0, number_of_cells - 1)
+    random_y = random.randint(0, number_of_cells - 1)
+    
+    return pygame.Vector2(random_x, random_y)
+
+
 class Snake:
 
   def __init__(self, window):
@@ -34,7 +51,7 @@ def main():
   clock = pygame.time.Clock()  # mao ata ning fps nya hahaha
   
   snake = Snake(window)
-  
+  food = Food(window)
   while True:
     
     for event in pygame.event.get():
@@ -55,53 +72,21 @@ def main():
 
     window.fill('black')
 
+    food.draw()
     snake.draw()
     snake.movement()
       
+    # Check if nakaon sa snake ang apple
+    if snake.body[0] == food.position:
+      # then e set napud nato ang position sa food into a random value
+      food.position = food.generate_random_position()
+      
+      # then set nato ang is_growing to True 
+      snake.is_growing = True
+    
     pygame.display.flip()
     clock.tick(15)
-  
-  # food_rect = pygame.Rect((food_pos.x * cell_size , food_pos.y * cell_size), (cell_size, cell_size))
-  # pygame.draw.rect(screen, (255, 0, 0), food_rect)
 
-  # for cell in snake_body:
-  #   snake_rect = pygame.Rect((cell.x * cell_size, cell.y * cell_size), (cell_size, cell_size))
-  #   pygame.draw.rect(screen, (0, 255, 0), snake_rect, 0, 4)
-  
-  # snake_body.insert(0, snake_body[0] + snake_direction)
-
-  # if not growing:
-  #   snake_body = snake_body[:-1]
-  # else:
-  #   growing = False
-  
-  # if snake_body[0] == food_pos:
-  #   growing = True 
-  #   new_food_pos = gen_random_pos()
-    
-  #   while new_food_pos in snake_body:
-  #     new_food_pos = gen_random_pos()
-      
-  #   food_pos = new_food_pos
-    
-  # pygame.display.flip()
-  # clock.tick(10)
-
-
-def gen_random_pos():
-  random_x = random.randint(0, number_of_cells)
-  random_y = random.randint(0, number_of_cells)
-  return pygame.Vector2(random_x, random_y)
-
-
-snake_body = [pygame.Vector2(5, 7), pygame.Vector2(5, 6), pygame.Vector2(5, 5)]
-food_pos = gen_random_pos()
-
-vel = 5
-snake_direction = pygame.Vector2(1, 0)
-
-# food_rect = pygame.Rect((food_pos.x, food_pos.y), (cell_size, cell_size))
-growing = False
 
 if __name__ == '__main__':
   main()
