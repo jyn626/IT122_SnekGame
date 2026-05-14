@@ -110,9 +110,10 @@ class Snake:
 
     def __init__(self, window):
         self.window = window
-        self.body = [pygame.Vector2(5, 7), pygame.Vector2(5, 6), pygame.Vector2(5, 5)]
+        self.body = [pygame.Vector2(5, 7), pygame.Vector2(5, 6)]
         self.is_growing = False
         self.direction = pygame.Vector2(1, 0)
+        self.new_direction = self.direction
         
     def draw(self):
         for cell in self.body:
@@ -141,19 +142,23 @@ def main():
                 pygame.quit()
                 sys.exit()
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_w and snake.direction.y != 1:
-                    snake.direction = pygame.Vector2(0, -1)
-                if event.key == pygame.K_s and snake.direction.y != -1:
-                    snake.direction = pygame.Vector2(0, 1)
-                if event.key == pygame.K_d and snake.direction.x != -1:
-                    snake.direction = pygame.Vector2(1, 0)
-                if event.key == pygame.K_a and snake.direction.x != 1:
-                    snake.direction = pygame.Vector2(-1, 0)
+              if event.key == pygame.K_d and snake.direction.x != -1:
+                  snake.new_direction = pygame.Vector2(1, 0)
+              elif event.key == pygame.K_a and snake.direction.x != 1:
+                  snake.new_direction = pygame.Vector2(-1, 0)
+              elif event.key == pygame.K_w and snake.direction.y != 1:
+                  snake.new_direction = pygame.Vector2(0, -1)
+              elif event.key == pygame.K_s and snake.direction.y != -1:
+                  snake.new_direction = pygame.Vector2(0, 1)
+              
+              print(snake.new_direction)
+              print(snake.direction)
 
         window.fill((25, 25, 25))
         food.draw()
         snake.draw()
         snake.movement()
+        snake.direction = snake.new_direction
           
         # Check if nakaon sa snake ang apple
         if snake.body[0] == food.position:
@@ -161,9 +166,8 @@ def main():
             snake.is_growing = True
 
         # Bawal Kaonon ang ikog rule
-        for segment in snake.body[1:]:
-            if snake.body[0] == segment:
-              game_over_screen(window)
+        if snake.body[0] in snake.body[1:]:
+          game_over_screen(window)
         
         if snake.body[0].x < 0:
             game_over_screen(window)
