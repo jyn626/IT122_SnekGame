@@ -6,60 +6,43 @@ cell_size = 25
 number_of_cells = 25
 
 retry_btn_image = pygame.image.load('./assets/retry_btn.png')
+SNAKE_COLOR = (52, 211, 153)
+FOOD_COLOR = (244, 63, 94)
+RETRY_BUTTON_COLOR = (234, 179, 8)
+QUIT_BUTTON_COLOR = (168, 85, 247)
+BACKGROUND_COLOR = (18, 24, 38)
 
 
 class Button:
 
-  def __init__(self, window, text, x, y, image):
+  def __init__(self, window, text, bg, fg, x, y):
     self.window = window 
     self.text = text
     self.x = x 
     self.y = y
-    self.font = pygame.font.SysFont(None, 60)
-    self.small_font = pygame.font.SysFont(None, 40)
-    
-    self.image = image.convert()
-    # self.image.set_colorkey('white')
-    self.image = pygame.transform.scale(self.image, (200, 100))
-    self.rect = self.image.get_rect()
-    self.image.set_colorkey('black')
-    self.rect.center = (self.x + (60 - 35), self.y + (50 - 40))
+    self.bg = bg 
+    self.fg = fg 
+    self.font = pygame.font.SysFont('./fonts/slkscre.ttf', 22)
+    self.rect = pygame.Rect(self.x, self.y, 150, 80)  
     
   def draw(self):
-    # retry ni
-    # rect = pygame.Rect(self.x, self.y, 120, 50)
-    # pygame.draw.rect(self.window, (0, 200, 0), self.rect, border_radius=10)
-    # text = self.small_font.render(self.text, True, (255, 255, 255))
-    self.window.blit(self.image, self.rect)
+    text = self.font.render(self.text, True, self.fg)
+    text_rect = text.get_rect(center=self.rect.center)
+
+    pygame.draw.rect(self.window, self.bg, self.rect)
+    self.window.blit(text, text_rect)
 
 
 def game_over_screen(window):
-    retry_button = Button(window, "Retry", 180, 280, retry_btn_image)
-    # pixel_font = pygame.font.Font('./fonts/slkscre.ttf')
-    font = pygame.font.Font('./fonts/slkscre.ttf', 60)
-    small_font = pygame.font.Font('./fonts/slkscre.ttf', 24)
+    retry_button = Button(window, "Retry", RETRY_BUTTON_COLOR, (0, 0, 0), 180, 280)
+    quit_button = Button(window, "Quit", QUIT_BUTTON_COLOR, (0, 0, 0), retry_button.rect.x + 200, 280)
 
     while True:
         # sa game over
-        game_over_text = font.render("GAME OVER!", True, (255, 0, 0))
-        window.blit(game_over_text, ((window.get_width() // 2) - 230, window.get_height() // 2 - 120))
-
-        # retry ni
-        # retry_rect = pygame.Rect(180, 280, 120, 50)
-        # pygame.draw.rect(window, (0, 200, 0), retry_rect, border_radius=10)
-        
         retry_button.draw()
-
-        # retry_text = small_font.render("Retry", True, (255, 255, 255))
-        # window.blit(retry_text, (205, 292))
-
         # Para sa quit button
-        quit_rect = pygame.Rect(330, 280, 120, 50)
-        pygame.draw.rect(window, (200, 0, 0), quit_rect, border_radius=10)
-
-        quit_text = small_font.render("Quit", True, (255, 255, 255))
-        window.blit(quit_text, (330 + 30, 292))
-
+        quit_button.draw()
+        
         pygame.display.update()
 
         for event in pygame.event.get():
@@ -74,8 +57,8 @@ def game_over_screen(window):
                 if retry_button.rect.collidepoint(mouse_pos):
                     main()
 
-                # quist button
-                if quit_rect.collidepoint(mouse_pos):
+                # quit button
+                if quit_button.rect.collidepoint(mouse_pos):
                     pygame.quit()
                     sys.exit()
 
@@ -89,7 +72,7 @@ class Food:
 
     def draw(self):
         rect = pygame.Rect((self.position.x * cell_size, self.position.y * cell_size), (cell_size, cell_size))
-        pygame.draw.rect(self.window, (255, 0, 0), rect)
+        pygame.draw.rect(self.window, FOOD_COLOR, rect)
         
     def generate_random_position(self):
         random_x = random.randint(0, number_of_cells - 1)
@@ -118,7 +101,7 @@ class Snake:
     def draw(self):
         for cell in self.body:
             rect = pygame.Rect((cell.x * cell_size, cell.y * cell_size), (cell_size, cell_size))
-            pygame.draw.rect(self.window, (0, 255, 0), rect, 0, 4)
+            pygame.draw.rect(self.window, SNAKE_COLOR, rect, 0, 4)
       
     def movement(self):
         self.body.insert(0, self.body[0] + self.direction)
@@ -154,7 +137,7 @@ def main():
               print(snake.new_direction)
               print(snake.direction)
 
-        window.fill((25, 25, 25))
+        window.fill(BACKGROUND_COLOR)
         food.draw()
         snake.draw()
         snake.movement()
