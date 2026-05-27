@@ -53,7 +53,7 @@ def game_over_screen(window, score, high_score):
         "Retry",
         RETRY_BUTTON_COLOR,
         (0, 0, 0),
-        180,
+        window.get_width() // 2 - 250,
         280
     )
 
@@ -62,11 +62,11 @@ def game_over_screen(window, score, high_score):
         "Quit",
         QUIT_BUTTON_COLOR,
         (0, 0, 0),
-        retry_button.rect.x + 200,
+        retry_button.rect.x + 350,
         280
     )
 
-    #para naay score ug high score sa game over
+    # para naay score ug high score sa game over
     font = pygame.font.Font('./fonts/slkscre.ttf', 36)
 
     score_text = font.render(
@@ -175,9 +175,20 @@ class Snake:
         self.new_direction = self.direction
 
     def draw(self):
+        """
+        for drawing, its gonna be a grid by grid system 
+        so we will not do our movement by pixels but by grid.
+        """
 
+        # here we draw every cell in the snake.body
         for cell in self.body:
-
+            # the parameters are, respectively: x, y, width, height
+            # we need to multiply the cell's x and y by the tile size
+            # because this is a grid system, we will move or place each cell 
+            # by grid. take for example
+            #  cell.x -> 1px, then cell.x * 25 = 25 (that's one block)
+            #  cell.x -> 2px, then cell.x * 25 = 50 (that's two blocks)
+            # and so on...
             rect = pygame.Rect(
                 (cell.x * cell_size,
                  cell.y * cell_size),
@@ -185,6 +196,7 @@ class Snake:
                 (cell_size, cell_size)
             )
 
+            # the parameters are, respectively: window, color, rect (object), rectangle thickness, border radius
             pygame.draw.rect(
                 self.window,
                 SNAKE_COLOR,
@@ -194,18 +206,28 @@ class Snake:
             )
 
     def movement(self):
+        """
+        for the movement, it constantly adds new `head` (with the new coordinates) 
+        and removes the `tail` every frame so it creates the illusion of movement
+        """
 
+        # suppose the current head's vector is (5, 6) and our direction is right (1, 0)
+        # we will add it up so (6, 6), and this becomes the new head
+        new_head = self.body[0] + self.direction 
+        
+        # insert the new head in the place of the current head (to replace it as the new head)
         self.body.insert(
             0,
-            self.body[0] + self.direction
+            new_head
         )
 
+        # we check if we currently aren't eating the apple in the current frame
         if not self.is_growing:
-
-            self.body = self.body[:-1]
+            # if NOT then we remove the tail to keep the length
+            self.body = self.body[:-1]  # [:-1] excludes the last element of the array.
 
         else:
-
+            # but if we are eating, then we won't remove the tail, so it grows 1 block. 
             self.is_growing = False
 
 
@@ -217,13 +239,12 @@ def main():
 
     window = pygame.display.set_mode(
         (
-            cell_size * number_of_cells + 100,
+            cell_size * number_of_cells,
             cell_size * number_of_cells
         )
     )
 
     clock = pygame.time.Clock()
-
     
     score = 0
 
@@ -262,7 +283,7 @@ def main():
 
         window.fill(BACKGROUND_COLOR)
 
-        #para sa score sa top left
+        # para sa score sa top left
         score_text = font.render(
             f"Score: {score}",
             True,
@@ -278,7 +299,6 @@ def main():
         snake.movement()
 
         snake.direction = snake.new_direction
-
         
         if snake.body[0] == food.position:
 
@@ -288,12 +308,11 @@ def main():
 
             score += 1
 
-            #para ma update ang highest score
+            # para ma update ang highest score
             if score > high_score:
                 high_score = score
 
         if snake.body[0] in snake.body[1:]:
-
 
             game_over_screen(window, score, high_score)
 
@@ -301,9 +320,9 @@ def main():
 
             game_over_screen(window, score, high_score)
 
-            snake.body[0].x = number_of_cells - 1
+            snake.body[0].x = number_of_cells
 
-        elif snake.body[0].x >= number_of_cells + 8:
+        elif snake.body[0].x >= number_of_cells:
 
             game_over_screen(window, score, high_score)
 
@@ -313,7 +332,7 @@ def main():
 
             game_over_screen(window, score, high_score)
 
-            snake.body[0].y = number_of_cells - 1
+            snake.body[0].y = number_of_cells
 
         elif snake.body[0].y >= number_of_cells:
 
