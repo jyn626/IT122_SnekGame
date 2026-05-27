@@ -150,6 +150,8 @@ class Food:
         coordinates = pygame.Vector2(random_x, random_y)
 
         # check nato if kani nga coordinate is naa sa sulod sa snake
+        
+        # *** Algorithm used: Linear Search  
         # * keep generating random food positions until the coordinates
         # * is outside the snake.
         while coordinates in self.snake_body:
@@ -328,9 +330,9 @@ def main():
         # * which means nabangga ang snake sa iyang own body!
         
         # *** Algorithm used: Linear Search  
-        # we visit each cell of snake's body (excluding the head)
-        # and we check if the snake's head is as the same position
-        # as the cell we visited, which means they collided.
+        # * we visit each cell of snake's body (excluding the head)
+        # * and we check if the snake's head is as the same position
+        # * as the cell we visited, which means they collided.
 
         snake_body = snake.body[1:]
         for cell in snake_body:
