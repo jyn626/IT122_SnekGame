@@ -142,14 +142,18 @@ class Food:
         pygame.draw.rect(self.window, FOOD_COLOR, rect)
 
     def generate_random_position(self):
-
+        # generate random values between 0 and 24
+        # * minus 1, because counting starts with 0. 25 -> outside the window
         random_x = random.randint(0, number_of_cells - 1)
         random_y = random.randint(0, number_of_cells - 1)
 
         coordinates = pygame.Vector2(random_x, random_y)
 
+        # check nato if kani nga coordinate is naa sa sulod sa snake
+        # * keep generating random food positions until the coordinates
+        # * is outside the snake.
         while coordinates in self.snake_body:
-
+            
             random_x = random.randint(0, number_of_cells - 1)
             random_y = random.randint(0, number_of_cells - 1)
 
@@ -163,7 +167,9 @@ class Snake:
     def __init__(self, window):
 
         self.window = window
-
+        # the snake body are just an array of vectors (Vector2)
+        # vector2 is a pair of x, y values that represents our direction or 
+        # a specific point.
         self.body = [
             pygame.Vector2(5, 7),
             pygame.Vector2(5, 6)
@@ -171,6 +177,7 @@ class Snake:
 
         self.is_growing = False
 
+        # direction to move the snake to the right
         self.direction = pygame.Vector2(1, 0)
         self.new_direction = self.direction
 
@@ -263,21 +270,23 @@ def main():
                 pygame.quit()
                 sys.exit()
 
+            # check for key events (MOVEMENT)
             elif event.type == pygame.KEYDOWN:
 
                 if event.key == pygame.K_d and snake.direction.x != -1:
-
+                    # move right (positive, 0)
                     snake.new_direction = pygame.Vector2(1, 0)
 
                 elif event.key == pygame.K_a and snake.direction.x != 1:
-
+                    # move left (negative, 0)
                     snake.new_direction = pygame.Vector2(-1, 0)
 
                 elif event.key == pygame.K_w and snake.direction.y != 1:
-
+                    # move up (0, negative)
                     snake.new_direction = pygame.Vector2(0, -1)
 
                 elif event.key == pygame.K_s and snake.direction.y != -1:
+                    # move down (0, positive)
 
                     snake.new_direction = pygame.Vector2(0, 1)
 
@@ -298,12 +307,15 @@ def main():
 
         snake.movement()
 
+        snake_head = snake.body[0]
         snake.direction = snake.new_direction
         
-        if snake.body[0] == food.position:
-
+        # here we check if the snake's head is at the position of the food
+        # * basically if we have EATEN a food
+        if snake_head == food.position:
+            # put the food at random places again
             food.position = food.generate_random_position()
-
+            # we set the is_growing to True to let the snake grow.
             snake.is_growing = True
 
             score += 1
@@ -312,37 +324,51 @@ def main():
             if score > high_score:
                 high_score = score
 
-        if snake.body[0] in snake.body[1:]:
+        # here, atong gi check if ang head sa snake is same position sa one of its cells
+        # * which means nabangga ang snake sa iyang own body!
+        
+        # *** Algorithm used: Linear Search  
+        # we visit each cell of snake's body (excluding the head)
+        # and we check if the snake's head is as the same position
+        # as the cell we visited, which means they collided.
+
+        snake_body = snake.body[1:]
+        for cell in snake_body:
+            if snake_head == cell:
+                # if so, then game over
+                game_over_screen(window, score, high_score)
+
+        # check if snake touched the left side border of the window
+        if snake_head.x < 0:
+            game_over_screen(window, score, high_score)
+            # then reset the position of the snake
+            snake_head.x = number_of_cells
+
+        # check if snake touched the left right border of the window
+        elif snake_head.x >= number_of_cells:
 
             game_over_screen(window, score, high_score)
 
-        if snake.body[0].x < 0:
+            snake_head.x = 0
+
+        # check if snake touched the upper side border of the window
+        if snake_head.y < 0:
 
             game_over_screen(window, score, high_score)
 
-            snake.body[0].x = number_of_cells
+            snake_head.y = number_of_cells
 
-        elif snake.body[0].x >= number_of_cells:
-
-            game_over_screen(window, score, high_score)
-
-            snake.body[0].x = 0
-
-        if snake.body[0].y < 0:
+        # check if snake touched the down side border of the window
+        elif snake_head.y >= number_of_cells:
 
             game_over_screen(window, score, high_score)
 
-            snake.body[0].y = number_of_cells
-
-        elif snake.body[0].y >= number_of_cells:
-
-            game_over_screen(window, score, high_score)
-
-            snake.body[0].y = 0
+            snake_head.y = 0
 
         pygame.display.flip()
 
-        clock.tick(12)
+        # 12 - frames per second, much higher much fast
+        clock.tick(8)
 
 
 if __name__ == '__main__':
